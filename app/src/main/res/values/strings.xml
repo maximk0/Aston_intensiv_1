@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">AppMusic</string>
+    <string name="description_bnt_previous">Button: previous</string>
+    <string name="description_bnt_play">Button: play</string>
+    <string name="description_bnt_pause">Button: pause</string>
+    <string name="description_bnt_next">Button: next</string>
+    <string name="track_name">%s</string>
 </resources>
