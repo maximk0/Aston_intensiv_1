@@ -17,7 +17,7 @@
         android:marqueeRepeatLimit="marquee_forever"
         android:scrollHorizontally="true"
         android:singleLine="true"
-        android:text="@string/track_name"
+        android:text="@string/press_play"
         android:layout_margin="32dp"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
@@ -26,13 +26,13 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottieAnimationView"
-        android:layout_width="250dp"
-        android:layout_height="300dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/play"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        app:layout_constraintBottom_toTopOf="@+id/previous"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/track_name" />
+        app:layout_constraintTop_toBottomOf="@+id/track_name"
+        app:lottie_rawRes="@raw/girl_listening_to_music" />
 
     <ImageButton
         android:id="@+id/play"
@@ -43,7 +43,6 @@
         android:src="@drawable/ic_play"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.734" />
@@ -81,12 +80,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
+        android:contentDescription="@string/description_bnt_pause"
         android:src="@drawable/ic_pause"
-        android:visibility="gone"
+        android:visibility="invisible"
+        app:layout_constraintVertical_bias="0.734"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="@string/description_bnt_pause"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

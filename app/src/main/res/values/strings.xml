@@ -5,4 +5,5 @@
     <string name="description_bnt_pause">Button: pause</string>
     <string name="description_bnt_next">Button: next</string>
     <string name="track_name">%s</string>
+    <string name="press_play">Press play</string>
 </resources>
