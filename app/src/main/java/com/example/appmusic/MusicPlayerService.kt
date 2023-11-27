@@ -5,28 +5,27 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
 import android.media.MediaPlayer
+import android.os.Build
 import android.os.IBinder
+import androidx.core.app.NotificationCompat
 
 class MusicPlayerService : Service() {
 
     private var music: MediaPlayer? = null
-    var isPaused = true
-        private set
+
+    override fun onBind(p0: Intent): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
-//        music = MediaPlayer.create(this, listOfTracks.first())
-//        music?.start()
+        startForegroundService()
     }
-
-    override fun onBind(p0: Intent): IBinder? = null
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         when (intent.action) {
             Constants.ACTION.START_FOREGROUND_ACTION -> {
-                startForeground(NOTIFICATION_ID, createNotification())
-                playMusic(1)
+                playMusic(currentSoundtrack)
             }
 
             Constants.ACTION.STOP_FOREGROUND_ACTION -> {
@@ -35,13 +34,11 @@ class MusicPlayerService : Service() {
             }
 
             Constants.ACTION.NEXT_FOREGROUND_ACTION -> {
-                startForeground(NOTIFICATION_ID, createNotification())
-                changeTrack(true)
+                nextTrack()
             }
 
             Constants.ACTION.PREVIOUS_FOREGROUND_ACTION -> {
-                startForeground(NOTIFICATION_ID, createNotification())
-                changeTrack(false)
+                previousTrack()
             }
         }
         return super.onStartCommand(intent, flags, startId)
@@ -53,46 +50,81 @@ class MusicPlayerService : Service() {
         val pendingIntent =
             PendingIntent.getService(this, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE)
 
-        return Notification.Builder(this, Constants.NOTIFICATION_CHANNEL_ID)
-            .setContentTitle("Music Player")
-            .setContentText("Playing")
+        return NotificationCompat.Builder(this, Constants.NOTIFICATION_CHANNEL_ID)
+            .setContentTitle(NOTIFICATION_TITLE)
+            .setContentText(NOTIFICATION_TEXT)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentIntent(pendingIntent)
             .build()
     }
 
-    private fun playMusic(index: Int) {
+    private fun startForegroundService() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(
+                NOTIFICATION_ID,
+                createNotification(),
+                FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+            )
+        } else {
+            startForeground(NOTIFICATION_ID, createNotification())
+        }
+
+    }
+
+    private fun playMusic(numberOfTrack: Int) {
         isPaused = false
-        music = MediaPlayer.create(this, listOfTracks[index])
+        soundtrackName = listOfTracks[numberOfTrack]
+
+        music?.stop()
+        music = MediaPlayer.create(this, listOfTracks[numberOfTrack])
         music?.start()
     }
 
     private fun stopMusic() {
         isPaused = true
+
         music?.stop()
         music?.release()
         music = null
     }
 
-    private fun changeTrack(isNext: Boolean) {
-        music?.stop()
-        when (isNext) {
-            true -> playMusic(listOfTracks.lastIndex)
-            false -> playMusic(0)
+    private fun nextTrack() {
+        currentSoundtrack++
+        if (currentSoundtrack > listOfTracks.lastIndex) {
+            currentSoundtrack = 0
         }
+        playMusic(currentSoundtrack)
+    }
+
+    private fun previousTrack() {
+        currentSoundtrack--
+        if (currentSoundtrack < 0) {
+            currentSoundtrack = listOfTracks.lastIndex
+        }
+       playMusic(currentSoundtrack)
     }
 
     companion object {
-        const val NOTIFICATION_ID = 1
-
-        val listOfTracks = listOf(
+        private val listOfTracks = listOf(
             R.raw.nikelback_we_will_rock_you,
             R.raw.imagine_dragons_im_so_sorry,
             R.raw.merelin_menson_sweet_dreems
         )
 
+        private var currentSoundtrack = 0
+        var isPaused = true
+            private set
+
+        var soundtrackName = listOfTracks[currentSoundtrack]
+            private set
+
+        const val NOTIFICATION_ID = 1
+        const val NOTIFICATION_TITLE = "Music Player"
+        const val NOTIFICATION_TEXT = "Soundtrack is playing"
+
         fun getIntent(context: Context) = Intent(context, MusicPlayerService::class.java)
     }
+
 }
 
 object Constants {
